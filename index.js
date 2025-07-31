@@ -20,7 +20,7 @@ app.post('/proxy-token', async (req, res) => {
     const client_secret_sign = Buffer.from(hashed).toString('base64');
 
     const response = await axios.post(
-      'https://api.commerce.naver.com/oauth2/token',
+      'https://api.commerce.naver.com/v1/oauth2/token',
       {
         client_id,
         timestamp,
