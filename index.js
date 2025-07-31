@@ -27,6 +27,7 @@ app.post('/proxy-token', async (req, res) => {
       grant_type: 'client_credentials',
       client_id: process.env.CLIENT_ID,
       client_secret: process.env.CLIENT_SECRET,
+      timestamp: timestamp,
       client_secret_sign: client_secret_sign,
     });
 
