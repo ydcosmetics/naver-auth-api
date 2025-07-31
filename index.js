@@ -12,34 +12,42 @@ app.use(express.json());
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
 
+
 app.post('/proxy-token', async (req, res) => {
   const timestamp = Date.now();
   const password = `${client_id}_${timestamp}`;
+
   try {
     const hashed = await bcrypt.hash(password, client_secret);
     const client_secret_sign = Buffer.from(hashed).toString('base64');
 
-    const response = await axios.post(
-      'https://api.commerce.naver.com/v1/oauth2/token',
-      {
-        client_id,
-        timestamp,
-        client_secret_sign,
-        grant_type: 'client_credentials',
-        type: 'SELF'
+    const data = qs.stringify({
+      type: 'SELF',
+      grant_type: 'client_credentials',
+      client_id: process.env.CLIENT_ID,
+      client_secret: process.env.CLIENT_SECRET,
+      client_secret_sign: client_secret_sign,
+    });
+
+    const config = {
+      method: 'post',
+      url: 'https://api.commerce.naver.com/external/v1/oauth2/token',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
       },
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-      }
-    );
-    res.json(response.data);
+      data: data,
+      maxBodyLength: Infinity,
+    };
+
+    const response = await axios.request(config);
+    res.status(200).json(response.data);
   } catch (err) {
-    res
-      .status(err.response?.status || 500)
-      .json({ error: err.response?.data || err.message });
+    console.error(err.response?.data || err.message);
+    res.status(500).json({
+      message: 'Error requesting token',
+      error: err.response?.data || err.message,
+    });
   }
 });
 
