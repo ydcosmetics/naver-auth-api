@@ -30,7 +30,7 @@ app.post('/proxy-token', async (req, res) => {
       },
       {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json'
         }
       }
